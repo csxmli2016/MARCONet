@@ -14,7 +14,7 @@ S-Lab, Nanyang Technological University
 - [ ] Release all the code before June.
 
 
-## Real-world Chinese Text Image Super-resulution
+## Real-world LR Chinese Text Image Super-resulution
 <img src="./Imgs/f1_2.png">
 
 
