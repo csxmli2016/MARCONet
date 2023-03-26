@@ -25,7 +25,7 @@ S-Lab, Nanyang Technological University
 
 
 ## License
-This project is licensed under <a rel="license" href="https://github.com/csxmli2016/marconet/blob/master/LICENSE">NTU S-Lab License 1.0</a>. Redistribution and use should follow this license.
+This project is licensed under <a rel="license" href="https://github.com/csxmli2016/MARCONet/blob/main/LICENSE">NTU S-Lab License 1.0</a>. Redistribution and use should follow this license.
 
 ## Acknowledgement
 This project is built based on the excellent [BasicSR](https://github.com/XPixelGroup/BasicSR) and [KAIR](https://github.com/cszn/KAIR).
