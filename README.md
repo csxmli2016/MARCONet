@@ -1,4 +1,4 @@
-## [Learning Generative Structure Prior for Blind Text Image Super-resolution](#)
+## [Learning Generative Structure Prior for Blind Text Image Super-resolution](https://arxiv.org/pdf/2303.14726.pdf)
 
 [Xiaoming Li](https://csxmli2016.github.io/), [Wangmeng Zuo](https://scholar.google.com/citations?hl=en&user=rUOpCEYAAAAJ&view_op=list_works), [Chen Change Loy](https://www.mmlab-ntu.com/person/ccloy/)
 
