@@ -31,7 +31,11 @@ or
 - [GoogleDrive](https://drive.google.com/drive/folders/1lzPkboqvGYaUaQK1O9g8TDKKQcBO7ezU?usp=sharing)
 or
 ```
-python checkpoints/download.py
+python checkpoints/download_google.py
+```
+or
+```
+python checkpoints/download_github.py (Preferred)
 ```
 
 ## Inference for SR
@@ -60,7 +64,7 @@ For example, the following LR input with text label from transformer encoder:
 
 <img src="./Imgs/real_lqe02_err.png"  width="600px">
 
-By manually providing the text lables on the image name: (format: '*_开发区曲虹电子有限公司.png')
+By manually providing the text lables on the image name: (format: '*_开发区雨虹电子有限公司.png')
 
 ```
 CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
