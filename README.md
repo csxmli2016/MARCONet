@@ -24,7 +24,7 @@ pip install -r requirements.txt
 BASICSR_EXT=True pip install basicsr
 ```
 
-## Pre-train Models
+## Pre-trained Models
 Download the pretrained models from the following url and put them into ./checkpoints/
 - [BaiduNetDisk](https://pan.baidu.com/s/1PTXxgL8DICNUoBLWhPGSLA?pwd=dnsx)
 or
@@ -32,9 +32,7 @@ or
 or
 ```
 python checkpoints/download_google.py
-```
 or
-```
 python checkpoints/download_github.py (Preferred)
 ```
 
@@ -48,13 +46,13 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 -o: save path, default: None will automatically make the save dir with format [LR path]_TIME_MARCONet
 ```
 
-### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, structure prior image)
+### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
 <img src="./Imgs/real_lq01.png"  height="220px">&nbsp;&nbsp;<img src="./Imgs/real_lq04.png"  height="220px">
 
 <img src="./Imgs/real_lq02.png"  height="200px">&nbsp;&nbsp;<img src="./Imgs/real_lq09.png"  height="200px">
 
 
-### Real-world LR Chinese Text Image Super-resulution
+### Real-world LR Chinese Text Image Super-resolution
 <img src="./Imgs/f1_2.png"  width="800px">
 
 ### Manually correct the text recognition results
