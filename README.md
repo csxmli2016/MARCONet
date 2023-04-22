@@ -25,7 +25,7 @@ BASICSR_EXT=True pip install basicsr
 ```
 
 ## Pre-trained Models
-Download the pretrained models from the following url and put them into ./checkpoints/
+Download the pre-trained models from the following URL and put them into ./checkpoints/
 - [BaiduNetDisk](https://pan.baidu.com/s/1PTXxgL8DICNUoBLWhPGSLA?pwd=dnsx)
 or
 - [GoogleDrive](https://drive.google.com/drive/folders/1lzPkboqvGYaUaQK1O9g8TDKKQcBO7ezU?usp=sharing)
@@ -43,7 +43,7 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 ```
 # Parameters:
 -i: LR path, default: ./Testsets/LQs
--o: save path, default: None will automatically make the save dir with the format of '[LR path]_TIME_MARCONet'
+-o: save path, default: None will automatically make the saving dir with the format of '[LR path]_TIME_MARCONet'
 ```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
@@ -56,13 +56,13 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 <img src="./Imgs/f1_2.png"  width="800px">
 
 ### Manually correct the text recognition results
-Since some characters easily have wrong prediction when the degradation is severe, here we can manually provide the text labels.
+Since some characters easily have the wrong predictions when the degradation is severe, here we can manually provide the text labels.
 
-For example, the following LR input with the text label from transformer encoder:
+For example, the following LR input with the text label from the transformer encoder:
 
 <img src="./Imgs/real_lqe02_err.png"  width="600px">
 
-By manually providing the text lables on the image name (format: '*_开发区雨虹电子有限公司.png'):
+By manually providing the text labels on the image name (format: '*_开发区雨虹电子有限公司.png'):
 
 ```
 CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
@@ -70,7 +70,7 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
 ```
 # Parameters:
 -i: LR path, default: ./Testsets/LQsWithText
--o: save path, default: None will automatically make the save path with the format of '[LR path]_TIME_MARCONet'
+-o: save path, default: None will automatically make the saving path with the format of '[LR path]_TIME_MARCONet'
 -m: default: store_true, using text label from the LR image name
 ```
 
@@ -89,12 +89,12 @@ CUDA_VISIBLE_DEVICES=0 python test_w.py
 #Parameters
 -w1: image path for extracting the font style w. Default: './Testsets/TestW/w1.png'
 -w2: image path for extracting the font style w2. Default: './Testsets/TestW/w2.png'
--o: save path for saving the interpolation results. Default: './Testsets/TestW'
+-o: save path for the interpolation results. Default: './Testsets/TestW'
 ```
 
 <img src="./Imgs/w.png"  width="800px">
 
-## GIF for interpolating w predicted from two text images with the same characters
+## GIF for interpolating w predicted from two text images with different styles
 <img src="./Testsets/TestW/w2.png"  width="800px">
 <img src="./Imgs/w.gif" width="800px">
 <img src="./Testsets/TestW/w1.png"  width="800px">
