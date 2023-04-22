@@ -40,21 +40,20 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 ```
 ```
 # Parameters:
--i: [LR path], default: ./Testsets/LQs
--o: [save path], default: None will automatically make the save dir with format [LR path]_TIME_MARCONet
+-i: LR path, default: ./Testsets/LQs
+-o: save path, default: None will automatically make the save dir with format [LR path]_TIME_MARCONet
 ```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, structure prior image)
-<img src="./Imgs/real_lq01.png"  height="220px">&nbsp; <img src="./Imgs/real_lq04.png"  height="220px">
+<img src="./Imgs/real_lq01.png"  height="220px">&nbsp;&nbsp;<img src="./Imgs/real_lq04.png"  height="220px">
 
-<br>
-<img src="./Imgs/real_lq02.png"  height="227px">&nbsp; <img src="./Imgs/real_lq09.png"  height="227px">
+<img src="./Imgs/real_lq02.png"  height="200px">&nbsp;&nbsp;<img src="./Imgs/real_lq09.png"  height="200px">
 
 
-## Real-world LR Chinese Text Image Super-resulution
+### Real-world LR Chinese Text Image Super-resulution
 <img src="./Imgs/f1_2.png"  width="800px">
 
-## Manually correct the text recognition results
+### Manually correct the text recognition results
 Since some characters easily have wrong prediction when the degradation is severe, here we can manually provide the text label.
 
 For example, the following LR input with text label from transformer encoder:
@@ -68,8 +67,8 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
 ```
 ```
 # Parameters:
--i: [LR path], default: ./Testsets/LQs
--o: [save path], default: None will automatically make the save path with format [LR path]_TIME_MARCONet 
+-i: LR path, default: ./Testsets/LQsWithText
+-o: save path, default: None will automatically make the save path with format [LR path]_TIME_MARCONet 
 -m: default: store_true, using the text label from the LR image name
 ```
 
@@ -79,10 +78,21 @@ Then the SR results will be:
 
 
 
-## The W space controls the font style
+### The W space controls the font style
+```
+CUDA_VISIBLE_DEVICES=0 python test_w.py
+```
+
+```
+#Parameters
+-w1: image path for extracting the font style w. Default: './Testsets/TestW/w1.png'
+-w2: image path for extracting the font style w2. Default: './Testsets/TestW/w2.png'
+-o: save path for saving the interpolation results. Default: './Testsets/TestW'
+```
+
 <img src="./Imgs/w.png"  width="800px">
 
-## GIF for interpolating w from two text images with the same characters
+## GIF for interpolating w predicted from two text images with the same characters
 <img src="./Testsets/TestW/w2.png"  width="800px">
 <img src="./Imgs/w.gif" width="800px">
 <img src="./Testsets/TestW/w1.png"  width="800px">
