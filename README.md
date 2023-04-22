@@ -43,7 +43,7 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 ```
 # Parameters:
 -i: LR path, default: ./Testsets/LQs
--o: save path, default: None will automatically make the save dir with format [LR path]_TIME_MARCONet
+-o: save path, default: None will automatically make the save dir with the format of '[LR path]_TIME_MARCONet'
 ```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
@@ -52,17 +52,17 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 <img src="./Imgs/real_lq02.png"  height="200px">&nbsp;&nbsp;<img src="./Imgs/real_lq09.png"  height="200px">
 
 
-### Real-world LR Chinese Text Image Super-resolution
+### More real-world LR Chinese Text Image Super-resolution
 <img src="./Imgs/f1_2.png"  width="800px">
 
 ### Manually correct the text recognition results
-Since some characters easily have wrong prediction when the degradation is severe, here we can manually provide the text label.
+Since some characters easily have wrong prediction when the degradation is severe, here we can manually provide the text labels.
 
-For example, the following LR input with text label from transformer encoder:
+For example, the following LR input with the text label from transformer encoder:
 
 <img src="./Imgs/real_lqe02_err.png"  width="600px">
 
-By manually providing the text lables on the image name: (format: '*_开发区雨虹电子有限公司.png')
+By manually providing the text lables on the image name (format: '*_开发区雨虹电子有限公司.png'):
 
 ```
 CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
@@ -70,8 +70,8 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsWithText -m
 ```
 # Parameters:
 -i: LR path, default: ./Testsets/LQsWithText
--o: save path, default: None will automatically make the save path with format [LR path]_TIME_MARCONet 
--m: default: store_true, using the text label from the LR image name
+-o: save path, default: None will automatically make the save path with the format of '[LR path]_TIME_MARCONet'
+-m: default: store_true, using text label from the LR image name
 ```
 
 Then the SR results will be:
