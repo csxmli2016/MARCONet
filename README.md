@@ -45,7 +45,7 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 ```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, structure prior image)
-<img src="./Imgs/real_lq01.png"  height="250px">&nbsp; <img src="./Imgs/real_lq04.png"  height="250px">
+<img src="./Imgs/real_lq01.png"  height="220px">&nbsp; <img src="./Imgs/real_lq04.png"  height="220px">
 
 <br>
 <img src="./Imgs/real_lq02.png"  height="227px">&nbsp; <img src="./Imgs/real_lq09.png"  height="227px">
