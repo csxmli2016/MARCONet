@@ -80,7 +80,7 @@ Then the SR results will be:
 
 
 
-### The W space controls the font style
+## Inference for controlling the font style with w
 ```
 CUDA_VISIBLE_DEVICES=0 python test_w.py
 ```
@@ -94,17 +94,17 @@ CUDA_VISIBLE_DEVICES=0 python test_w.py
 
 <img src="./Imgs/w.png"  width="800px">
 
-## GIF for interpolating w predicted from two text images with different styles
+### GIF for interpolating w predicted from two text images with different styles
 <img src="./Testsets/TestW/w2.png"  width="800px">
 <img src="./Imgs/w.gif" width="800px">
 <img src="./Testsets/TestW/w1.png"  width="800px">
 
-## GIF for interpolating w from two text images with different characters
+### GIF for interpolating w from two text images with different characters
 <img src="./Testsets/TestW/w2.png"  width="800px">
 <img src="./Imgs/w2.gif" width="800px">
 <img src="./Testsets/LQs/real_lq02.png"  width="800px">
 
-## GIF for interpolating w from two text images with different locations
+### GIF for interpolating w from two text images with different locations
 <img src="./Testsets/TestW/w2.png"  width="800px">
 <img src="./Imgs/w3.gif" width="800px">
 <img src="./Testsets/LQs/syn_lq03.png"  width="800px">
