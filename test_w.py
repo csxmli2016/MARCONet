@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 from utils.alphabets import alphabet
 import imageio
 import argparse
+import os
 
 
 def print_networks(net):
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     print('{:>16s} : {:s}'.format('Input w2', args.w2_path))
     print('{:>16s} : {:s}'.format('Save Path', args.save_path))
     print('#'*64)
-
+    os.makedirs(args.save_path, exist_ok=True)
     main(args.w1_path, args.w2_path, args.save_path)
 
 
