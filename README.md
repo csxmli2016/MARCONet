@@ -105,9 +105,9 @@ CUDA_VISIBLE_DEVICES=0 python test_w.py
 <img src="./Testsets/LQs/real_lq02.png"  width="800px">
 
 ### GIF for interpolating w from two text images with different locations
-<img src="./Testsets/TestW/w2.png"  width="800px">
-<img src="./Imgs/w3.gif" width="800px">
-<img src="./Testsets/LQs/syn_lq03.png"  width="800px">
+<img src="./Imgs/w11.png"  width="800px">
+<img src="./Imgs/w10_11.gif" width="800px">
+<img src="./Imgs/w10.png"  width="800px">
 
 
 ## License
