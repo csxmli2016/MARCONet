@@ -23,6 +23,7 @@ conda activate marconet
 pip install -r requirements.txt
 BASICSR_EXT=True pip install basicsr
 ```
+> Please carefully following the install steps, especially the final one with **BASICSR_EXT=True**. 
 
 ## Pre-trained Models
 Download the pre-trained models from the following URL and put them into ./checkpoints/
