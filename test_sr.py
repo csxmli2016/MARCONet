@@ -9,6 +9,7 @@ import torchvision.transforms as transforms
 from utils.alphabets import alphabet
 import os
 import argparse
+import traceback
 
 
 def print_networks(net):
@@ -139,7 +140,8 @@ def main(L_path, save_path, manual_label):
             prior_features64.append(prior_fea64)
             prior_features32.append(prior_fea32)
         except:
-            print('\tError in {}'.format(img_basename))
+            traceback.print_exc()
+            print('\tError in {}. Continue...'.format(img_basename))
             continue
         
         preds_locs = preds_locs_l_r.clone()
