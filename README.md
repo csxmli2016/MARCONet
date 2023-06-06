@@ -12,6 +12,8 @@ S-Lab, Nanyang Technological University
 ## TODO
 - [x] Release the inference code and model in April.
 - [ ] Release all the code before June.
+- [ ] Release a model focusing on English letters and numbers.
+- [x] [We provide a simple blind text region super-resolution framework](https://github.com/csxmli2016/textbsr) by ```pip install textbsr```
 
 ## Getting Start
 
@@ -26,15 +28,9 @@ BASICSR_EXT=True pip install basicsr
 > Please carefully follow the installation steps, especially the final one with **BASICSR_EXT=True**. 
 
 ## Pre-trained Models
-Download the pre-trained models from the following URL and put them into ./checkpoints/
-- [BaiduNetDisk](https://pan.baidu.com/s/1PTXxgL8DICNUoBLWhPGSLA?pwd=dnsx)
-or
-- [GoogleDrive](https://drive.google.com/drive/folders/1lzPkboqvGYaUaQK1O9g8TDKKQcBO7ezU?usp=sharing)
-or
+Download the pre-trained models
 ```
-python checkpoints/download_google.py
-or
-python checkpoints/download_github.py (Preferred)
+python checkpoints/download_github.py
 ```
 
 ## Inference for SR
