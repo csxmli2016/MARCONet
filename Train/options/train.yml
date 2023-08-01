@@ -15,7 +15,7 @@ datasets:
     corpus_path2: ~ #./TrainData/ChineseCorpus/wiki_zh_Check.txt
     corpus_path3: ~ #./TrainData/ChineseCorpus/news2016zh_Check.txt
     max_text_length: !!float 16
-    min_text_length: !!float 2
+    min_text_length: !!float 4
     check_num: 16
     io_backend:
       type: disk
