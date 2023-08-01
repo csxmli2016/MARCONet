@@ -511,3 +511,5 @@ if __name__ == "__main__":
     ShowLocs = np.clip(ShowLocs.float().cpu().numpy(), 0, 1) * 255.0
     cv2.imwrite(osp.join(save_path, '{}_locs.png'.format(s_name)), ShowLocs)
 
+    print('Results are saved in ' + save_path)
+
