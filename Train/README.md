@@ -12,11 +12,11 @@ conda create -n marcotrain python=3.8 -y
 conda activate marcotrain
 pip install -r requirements.txt
 BASICSR_EXT=True pip install basicsr
+python setup.py develop
 ```
 > Please carefully follow the installation steps, especially the final one with **BASICSR_EXT=True**. 
 
 ## Downloading the initial models and fonts
-Download the pre-trained models
 ```
 python scripts/download.py
 ```
