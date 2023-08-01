@@ -310,9 +310,7 @@ class TSPGANModel(BaseModel):
 
         return {'1_ShowGT':ShowGT, '1_ShowLQSR':ShowLQSR, '1_ShowTestPreText': ShowPreText, 
                 '2_ShowTestPreLocs': ShowPredLocs,
-                '3_ShowPrior64': self.prior_characters64[:16,...].detach(), 
-                '7_ShowCharacterGT': ShowCharacterGT[:16,...], '7_ShowCharacterSR': ShowCharacterSR[:16,...], 
-                '6_ShowPCSR':self.tmp_sr_chars[:16,...], '6_ShowPCGT':self.tmp_gt_chars[:16,...],
+                '3_ShowCharacterGT': ShowCharacterGT[:16,...], '3_ShowCharacterSR': ShowCharacterSR[:16,...], 
                 }
 
 
