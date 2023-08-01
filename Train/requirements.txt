@@ -1,0 +1,10 @@
+torch>=1.7
+numpy<1.21  # numba requires numpy<1.21,>=1.17
+opencv-python
+torchvision
+scipy
+tqdm
+facexlib>=0.2.0.3
+lmdb
+pyyaml
+yapf

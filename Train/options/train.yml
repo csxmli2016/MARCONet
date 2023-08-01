@@ -1,0 +1,195 @@
+# general settings
+name: train_MARCONet 
+model_type: TSPGANModel
+num_gpu: auto  #
+# manual_seed: 0
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: Text
+    type: TextDegradationDataset
+    path_font: ./TrainData/FontsType-V1
+    path_bg: ./TrainData/BGSample/DF2K_Patch  #
+    corpus_path1: ./TrainData/ChineseCorpus/baike_Simple.txt # Full Version baike_qa_Check
+    corpus_path2: ~ #./TrainData/ChineseCorpus/wiki_zh_Check.txt
+    corpus_path3: ~ #./TrainData/ChineseCorpus/news2016zh_Check.txt
+    max_text_length: !!float 16
+    min_text_length: !!float 2
+    check_num: 16
+    io_backend:
+      type: disk
+    use_hflip: true
+    mean: [0.5, 0.5, 0.5]
+    std: [0.5, 0.5, 0.5]
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 2
+    batch_size_per_gpu: 2
+    dataset_enlarge_ratio: 1
+    # prefetch_mode: ~
+
+    prefetch_mode: cpu
+    num_prefetch_queue: 96
+    # prefetch_mode: cuda
+    # pin_memory: true
+  
+  val:
+    name: validation
+    type: ValDataset
+
+
+# network structures
+network_g:
+  type: TSPGAN
+  num_style_feat: 512
+
+network_encoder:
+  type: TextContextEncoderV2
+
+network_sr:
+  type: TSPSRNet
+
+network_d:
+  type: UNetDiscriminatorSN
+  num_in_ch: 3
+
+
+network_srd:
+  type: UNetDiscriminatorSN
+  num_in_ch: 6
+
+
+# path
+path:
+  pretrain_network_g: ./experiments/init/net_prior_generation.pth
+  pretrain_network_encoder: ./experiments/init/net_transformer_encoder.pth
+  pretrain_network_sr: ./experiments/init/net_sr.pth
+  param_key_g: params_ema
+  strict_load_g: ~
+  pretrain_network_d: ./experiments/init/net_d.pth
+  pretrain_network_srd: ./experiments/init/net_srd.pth
+  pretrain_network_ocr: ~ 
+  resume_state: ~ 
+
+# training settings
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 1e-5 #2e-4
+  optim_d:
+    type: Adam
+    lr: !!float 1e-4
+  optim_ocr:
+    type: SGD
+    lr: !!float 1e-3
+  optim_encoder:
+    type: Adam
+    lr: !!float 2e-5 # 1e-4
+  optim_sr:
+    type: Adam
+    lr: !!float 5e-5
+  optim_srd:
+    type: Adam
+    lr: !!float 5e-5
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [600000, 700000]
+    gamma: 0.5
+
+  total_iter: 8000000
+  warmup_iter: -1  # no warm up
+
+  # #losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: !!float 10
+    reduction: mean
+  pixel_loss_lambda128: !!float 2 #from 5->2
+  pixel_loss_lambda64: !!float 1
+  pixel_loss_lambda32: !!float 1
+  pixel_loss_iou: !!float 5 # change from 2 ->1
+
+
+  srpixel_opt:
+    type: L1Loss
+    loss_weight: !!float 10
+    reduction: mean
+  pyramid_loss_weight: 1
+  remove_pyramid_loss: 50000
+
+
+  perceptual_opt:
+    type: LPIPSLossF
+    loss_weight: 1
+    net: vgg
+    reduction: mean
+  lpips_loss_lambda: !!float 1.0 # 0.1
+
+
+  #ocr loss
+  ocr_opt:
+    type: OCRLoss
+    reduction: mean
+    loss_weight: !!float 1
+  ctc_opt:
+    type: CTCLoss
+    reduction: mean
+    blank: 6735
+    loss_weight: !!float 1
+  ce_opt:
+    type: TextCELoss
+    loss_weight: !!float 1
+    num_cls: 6736
+  
+  ocr_loss_lambda: !!float 1
+  ctc_loss_lambda: !!float 1
+  ce_loss_lambda: !!float 0.1 # for bbx detection not used
+  diffreg_loss_lambda: !!float 0
+  iou_loss_lambda: !!float 1 # location loss for iou #reduce from 10 to 1, scale irrelavated
+  loc_loss_lambda: !!float 0.1 # location loss for center and all 0.8 for full
+  loc_loss_forwidth_lambda: !!float 0.2 # location loss for center and all 0.8 for full
+  increase_loss_lambda: !!float 0  # not used
+  loc_space_lambda: !!float 0.01 # not used
+  # gan loss
+  gan_opt:
+    type: GANLoss
+    gan_type: hinge #wgan_softplus
+    loss_weight: !!float 1
+  gan_loss_lambda: !!float 0.02 #0.05
+  srgan_loss_lambda: !!float 0.02 #0.05 paper
+  # r1 regularization for discriminator
+  r1_reg_weight: 10
+  # path length regularization for generator
+  path_batch_shrink: 2
+  path_reg_weight: 2
+
+  net_g_reg_every: 4
+  net_d_reg_every: 16
+  mixing_prob: 0.9
+
+  net_d_iters: 1
+  net_d_init_iters: 0
+
+# validation settings
+val:
+  val_freq: !!float 20
+  save_img: true
+
+# logging settings
+logger:
+  print_freq: 10
+  save_checkpoint_freq: !!float 1000
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
+
+find_unused_parameters: false
