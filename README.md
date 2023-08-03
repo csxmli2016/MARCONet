@@ -32,6 +32,8 @@ Download the pre-trained models
 ```
 python checkpoints/download_github.py
 ```
+## Training Code
+See ```./Train``` for more details.
 
 ## Inference for SR
 ```
