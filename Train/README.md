@@ -36,7 +36,7 @@ You can refer to the cropped samples in ```./TrainData/BGSample``` (400*400).
 
 You can generate them by running:
 ```
-python crop_DF2K.py
+python ./scripts/crop_DF2K.py
 ``` 
 
 
