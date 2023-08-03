@@ -11,7 +11,7 @@ S-Lab, Nanyang Technological University
 
 ## TODO
 - [x] Release the inference code and model in April.
-- [x] Release the training code.
+- [x] Release the training code. See ```./Train```
 - [ ] Release a model focusing on English letters and numbers.
 - [x] [We provide a simple blind text region super-resolution framework](https://github.com/csxmli2016/textbsr) by ```pip install textbsr```
 
