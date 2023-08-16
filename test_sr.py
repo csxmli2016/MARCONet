@@ -40,19 +40,20 @@ def clear_labels(TestPreds):
             labels.append(PredsInds[i])
     return labels
 
-def main(L_path, save_path, manual_label):
+def main(L_path, save_path, manual_label, eng):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    suffix_m = '_Eng' if eng else ''
     modelTSPGAN = networks.TSPGAN()
-    modelTSPGAN.load_state_dict(torch.load('./checkpoints/net_prior_generation.pth')['params'], strict=True)
+    modelTSPGAN.load_state_dict(torch.load('./checkpoints/net_prior_generation{}.pth'.format(suffix_m))['params'], strict=True)
     modelTSPGAN.eval()
 
     modelSR = networks.TSPSRNet()
-    modelSR.load_state_dict(torch.load('./checkpoints/net_sr.pth')['params'], strict=True)
+    modelSR.load_state_dict(torch.load('./checkpoints/net_sr{}.pth'.format(suffix_m))['params'], strict=True)
     modelSR.eval()
 
     modelEncoder = networks.TextContextEncoderV2()
-    modelEncoder.load_state_dict(torch.load('./checkpoints/net_transformer_encoder.pth')['params'], strict=True)
+    modelEncoder.load_state_dict(torch.load('./checkpoints/net_transformer_encoder{}.pth'.format(suffix_m))['params'], strict=True)
     modelEncoder.eval()
 
     print('{:>25s} : {} M Parameters'.format('Transformer Encoder', print_networks(modelEncoder)))
@@ -196,6 +197,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--test_path', type=str, default='./Testsets/LQs')
     parser.add_argument('-o', '--save_path', type=str, default=None)
     parser.add_argument('-m', '--manual', action='store_true')
+    parser.add_argument('-e', '--eng', action='store_true')
     args = parser.parse_args()
 
     save_path = args.save_path
@@ -210,7 +212,12 @@ if __name__ == '__main__':
         print('{:>25s} : {}'.format('The format of text label', 'using given text label (Please DOUBLE CHECK the LR image name)'))
     else:
         print('{:>25s} : {}'.format('The format of text label', 'using predicted text label'))
+    
+    if args.eng:
+        print('{:>25s} : {}'.format('Mainly Trained on', 'English and Number'))
+    else:
+        print('{:>25s} : {}'.format('Mainly Trained on', 'Chinese'))
 
-    main(args.test_path, save_path, args.manual)
+    main(args.test_path, save_path, args.manual, args.eng)
 
 
