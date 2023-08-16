@@ -12,7 +12,7 @@ S-Lab, Nanyang Technological University
 ## TODO
 - [x] Release the inference code and model in April.
 - [x] Release the training code. See ```./Train```
-- [ ] Release a model focusing on English letters and numbers.
+- [x] Release a model focusing on English letters and numbers.
 - [x] [We provide a simple blind text region super-resolution framework](https://github.com/csxmli2016/textbsr) by ```pip install textbsr```
 
 ## Getting Start
@@ -35,7 +35,7 @@ python checkpoints/download_github.py
 ## Training Code
 See ```./Train``` for more details.
 
-## Inference for SR
+## Inference for Chinese SR
 ```
 CUDA_VISIBLE_DEVICES=0 python test_sr.py 
 ```
@@ -43,6 +43,15 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 # Parameters:
 -i: LR path, default: ./Testsets/LQs
 -o: save path, default: None will automatically make the saving dir with the format of '[LR path]_TIME_MARCONet'
+```
+
+## Inference for English and Number SR
+```
+CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsEng -e
+```
+```
+# Parameters:
+-e: using model that fine-tuned on English and Number
 ```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
