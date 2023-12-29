@@ -320,6 +320,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--test_path', type=str, default='./Testsets/LQs')
     parser.add_argument('-o', '--save_path', type=str, default=None)
     parser.add_argument('-m', '--manual', action='store_true')
+    parser.add_argument('--real_ocr', action='store_true')
     args = parser.parse_args()
 
     '''
@@ -327,7 +328,10 @@ if __name__ == '__main__':
     Set 
     '''
     use_new_bbox = True
-    use_real_ocr = True
+    if args.real_ocr:
+        use_real_ocr = True
+    else:
+        use_real_ocr = False
 
     save_path = args.save_path
     if save_path is None:
@@ -347,8 +351,6 @@ if __name__ == '__main__':
     else:
         print('{:>28s} : {}'.format('OCR Module', 'using ocr model trained on our synthetic data'))
 
-    
-    
 
     main(args.test_path, save_path, args.manual, use_real_ocr, use_new_bbox)
 
