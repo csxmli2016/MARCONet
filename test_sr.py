@@ -61,18 +61,18 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
         modelBBox.load_state_dict(torch.load('./checkpoints/net_new_bbox.pth')['params'], strict=True)
         modelBBox.eval()
         modelBBox = modelBBox.to(device)
-        print('{:>25s} : {} M Parameters'.format('New BBOX Network', print_networks(modelBBox)))
+        print('{:>28s} : {} M Parameters'.format('New BBOX Network', print_networks(modelBBox)))
 
     if use_real_ocr:
         modelOCR = ocr.TransformerOCR()
         modelOCR.load_state_dict(torch.load('./checkpoints/net_real_world_ocr.pth')['params'], strict=True)
         modelOCR.eval()
         modelOCR = modelOCR.to(device)
-        print('{:>25s} : {} M Parameters'.format('New Real-world OCR Network', print_networks(modelOCR)))
+        print('{:>28s} : {} M Parameters'.format('New Real-world OCR Network', print_networks(modelOCR)))
 
-    print('{:>25s} : {} M Parameters'.format('Transformer Encoder', print_networks(modelEncoder)))
-    print('{:>25s} : {} M Parameters'.format('Structure Prior Network', print_networks(modelTSPGAN)))
-    print('{:>25s} : {} M Parameters'.format('Super-Resolution Network', print_networks(modelSR)))
+    print('{:>28s} : {} M Parameters'.format('Transformer Encoder', print_networks(modelEncoder)))
+    print('{:>28s} : {} M Parameters'.format('Structure Prior Network', print_networks(modelTSPGAN)))
+    print('{:>28s} : {} M Parameters'.format('Super-Resolution Network', print_networks(modelSR)))
     
     
     print('#'*64)
@@ -124,6 +124,12 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
         labels = clear_labels(preds_cls[0])
         pre_text = get_text_from_labels(labels)
 
+        preds_locs = preds_locs_l_r.clone()
+        for n in range(0, 16*2, 2):
+            preds_locs[0][n] = (preds_locs_l_r[0][n+1] + preds_locs_l_r[0][n]) / 2.0 #center
+            preds_locs[0][n+1] = (preds_locs_l_r[0][n+1] - preds_locs_l_r[0][n]) / 2.0 # width
+        
+
 
         assert w.size(0) == 1
         w0 = w[:1,...].clone() #
@@ -132,6 +138,7 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
         Step 2.5: Predicting the character labels using real-world OCR model trained on real-world chinese dataset, see:
         https://github.com/FudanVI/benchmarking-chinese-text-recognition/tree/main
         '''
+        
         if use_real_ocr:
             LQForOCR = cv2.resize(img, (256,32), interpolation=cv2.INTER_CUBIC)
             LQForOCR = transforms.ToTensor()(LQForOCR)
@@ -164,35 +171,16 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
                 else:
                     break
             text_pred_list = torch.Tensor(now_pred)[1:].long().cuda()
-            pred_text = ""
+            pre_text = ""
             for i in text_pred_list:
                 if i == (len(alphabet)+2):
                     continue
-                pred_text += alphabet[i-2]
+                pre_text += alphabet[i-2]
 
-            labels = get_labels_from_text(pred_text)
-            # print(['New:', pred_text, 'Previous Prediction', pre_text])
-
-
-        if manual_label:
-            tmp_str = img_basename.split('_')
-            pre_text = tmp_str[-1]
-            if len(pre_text) != len(labels):
-                print('\t !!!The given text has inconsistent number with our predicted lables. Please double check it.')
             labels = get_labels_from_text(pre_text)
-            print('Restoring {}. The given text: {}'.format(img_name, pre_text))
-        else:
-            pre_text = get_text_from_labels(labels)
-            print('Restoring {}. The predicted text: {}'.format(img_name, pre_text))
 
 
-        if len(pre_text) > 16:
-            print('\tToo much characters. The max length is 16.')
-            continue
-
-        if len(pre_text) < 1:
-            print('\tNo character is detected. Continue...')
-            continue
+        
 
         '''
         Step 2.75: Predicting the bbox using our synthtic images
@@ -230,23 +218,42 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
                 else:
                     break
             text_pred_list_bbox = torch.Tensor(now_pred)[1:].long().cuda()
-            pred_text_bbox = ""
+            pre_text_bbox = ""
             for i in text_pred_list_bbox:
                 if i == (len(alphabet)+2):
                     continue
-                pred_text_bbox += alphabet[i-2]
+                pre_text_bbox += alphabet[i-2]
 
-            if len(pred_text_bbox) != len(pred_text):
-                print('!!!!!! Change the label from {} to {}'.format(pred_text, pred_text_bbox))
-                pred_text = pred_text_bbox
-                labels = get_labels_from_text(pred_text)
+            if len(pre_text_bbox) != len(pre_text):
+                print('!!!!!! Change the label from {} to {}'.format(pre_text, pre_text_bbox))
+                pre_text = pre_text_bbox
+                labels = get_labels_from_text(pre_text)
 
             preds_locs = preds_locs_l_r.clone()
             for n in range(0, 16*2, 2):
                 preds_locs[0][n] = int(loc[0][n//2+2].item()) * ori_lq_w / 256 / 512 # for ocr 32*512
                 preds_locs[0][n+1] = 0 
 
-        
+        if manual_label:
+            tmp_str = img_basename.split('_')
+            pre_text = tmp_str[-1]
+            if len(pre_text) != len(labels):
+                print('\t !!!The given text has inconsistent number with our predicted lables. Please double check it.')
+            labels = get_labels_from_text(pre_text)
+            print('Restoring {}. The given text: {}'.format(img_name, pre_text))
+        else:
+            pre_text = get_text_from_labels(labels)
+            print('Restoring {}. The predicted text: {}'.format(img_name, pre_text))
+
+
+        if len(pre_text) > 16:
+            print('\tToo much characters. The max length is 16.')
+            continue
+
+        if len(pre_text) < 1:
+            print('\tNo character is detected. Continue...')
+            continue
+
         '''
         Step 3: Generating structure prior.
         '''
@@ -264,11 +271,6 @@ def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
             traceback.print_exc()
             print('\tError in {}. Continue...'.format(img_basename))
             continue
-        
-        # preds_locs = preds_locs_l_r.clone()
-        # for n in range(0, 16*2, 2):
-        #     preds_locs[0][n] = (preds_locs_l_r[0][n+1] + preds_locs_l_r[0][n]) / 2.0 #center
-        #     preds_locs[0][n+1] = (preds_locs_l_r[0][n+1] - preds_locs_l_r[0][n]) / 2.0 # width
         
 
         '''
@@ -318,7 +320,6 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--test_path', type=str, default='./Testsets/LQs')
     parser.add_argument('-o', '--save_path', type=str, default=None)
     parser.add_argument('-m', '--manual', action='store_true')
-    parser.add_argument('--real_ocr', action='store_false')
     args = parser.parse_args()
 
     '''
@@ -334,17 +335,17 @@ if __name__ == '__main__':
         save_path = osp.join(args.test_path+'_'+TIMESTAMP+'_MARCONet')
     os.makedirs(save_path, exist_ok=True)
     print('#'*64)
-    print('{:>25s} : {:s}'.format('Input Path', args.test_path))
-    print('{:>25s} : {:s}'.format('Save Path', save_path))
+    print('{:>28s} : {:s}'.format('Input Path', args.test_path))
+    print('{:>28s} : {:s}'.format('Save Path', save_path))
     if args.manual:
-        print('{:>25s} : {}'.format('The format of text label', 'using given text label (Please DOUBLE CHECK the LR image name)'))
+        print('{:>28s} : {}'.format('The format of text label', 'using given text label (Please DOUBLE CHECK the LR image name)'))
     else:
-        print('{:>25s} : {}'.format('The format of text label', 'using predicted text label'))
+        print('{:>28s} : {}'.format('The format of text label', 'using predicted text label'))
     
     if use_real_ocr:
-        print('{:>25s} : {}'.format('OCR Module', 'using ocr model trained on public chinese ocr dataset (Preferred)'))
+        print('{:>28s} : {}'.format('OCR Module', 'using ocr model trained on public chinese ocr dataset (Preferred)'))
     else:
-        print('{:>25s} : {}'.format('OCR Module', 'using ocr model trained on our synthetic data'))
+        print('{:>28s} : {}'.format('OCR Module', 'using ocr model trained on our synthetic data'))
 
     
     
