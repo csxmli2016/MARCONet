@@ -16,11 +16,15 @@ S-Lab, Nanyang Technological University
 
 > Note that this work only focuses on the LR input with a regular layout which may not have any perspective transformation (see the details in our paper).
 
+
+```diff
++ 2023-12-29: (New) We update a new bounding box detection and real-world OCR models, which is much better than the previous models.
+```
+
 ## TODO
 - [x] Release the inference code and model in April.
 - [x] Release the training code. See ```./Train```
 - [x] [We provide a simple blind text region super-resolution framework](https://github.com/csxmli2016/textbsr) by ```pip install textbsr```
-- [x] 2023-12-29: (New) We update a new bounding box detection model and real-world OCR model. The Character Bounding Box Detection is much better than the previous model.
 
 ## Getting Start
 
