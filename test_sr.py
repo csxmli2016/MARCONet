@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import os.path as osp
 import time
-from models import networks
+from models import networks, ocr
 import torchvision.transforms as transforms
 from utils.alphabets import alphabet
 import os
@@ -32,6 +32,7 @@ def get_text_from_labels(TestPreds):
     return PredsText
 
 
+
 def clear_labels(TestPreds):
     labels = []
     PredsInds = torch.max(TestPreds.detach(), 1)[1]
@@ -40,30 +41,47 @@ def clear_labels(TestPreds):
             labels.append(PredsInds[i])
     return labels
 
-def main(L_path, save_path, manual_label, eng):
+def main(L_path, save_path, manual_label, use_real_ocr, use_new_bbox):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    suffix_m = '_Eng' if eng else ''
     modelTSPGAN = networks.TSPGAN()
-    modelTSPGAN.load_state_dict(torch.load('./checkpoints/net_prior_generation{}.pth'.format(suffix_m))['params'], strict=True)
+    modelTSPGAN.load_state_dict(torch.load('./checkpoints/net_prior_generation.pth')['params'], strict=True)
     modelTSPGAN.eval()
 
     modelSR = networks.TSPSRNet()
-    modelSR.load_state_dict(torch.load('./checkpoints/net_sr{}.pth'.format(suffix_m))['params'], strict=True)
+    modelSR.load_state_dict(torch.load('./checkpoints/net_sr.pth')['params'], strict=True)
     modelSR.eval()
 
     modelEncoder = networks.TextContextEncoderV2()
-    modelEncoder.load_state_dict(torch.load('./checkpoints/net_transformer_encoder{}.pth'.format(suffix_m))['params'], strict=True)
+    modelEncoder.load_state_dict(torch.load('./checkpoints/net_transformer_encoder.pth')['params'], strict=True)
     modelEncoder.eval()
+
+    if use_new_bbox:
+        modelBBox = ocr.TransformerOCR(use_new_bbox=True)
+        modelBBox.load_state_dict(torch.load('./checkpoints/net_new_bbox.pth')['params'], strict=True)
+        modelBBox.eval()
+        modelBBox = modelBBox.to(device)
+        print('{:>25s} : {} M Parameters'.format('New BBOX Network', print_networks(modelBBox)))
+
+    if use_real_ocr:
+        modelOCR = ocr.TransformerOCR()
+        modelOCR.load_state_dict(torch.load('./checkpoints/net_real_world_ocr.pth')['params'], strict=True)
+        modelOCR.eval()
+        modelOCR = modelOCR.to(device)
+        print('{:>25s} : {} M Parameters'.format('New Real-world OCR Network', print_networks(modelOCR)))
 
     print('{:>25s} : {} M Parameters'.format('Transformer Encoder', print_networks(modelEncoder)))
     print('{:>25s} : {} M Parameters'.format('Structure Prior Network', print_networks(modelTSPGAN)))
     print('{:>25s} : {} M Parameters'.format('Super-Resolution Network', print_networks(modelSR)))
+    
+    
     print('#'*64)
     
     modelTSPGAN = modelTSPGAN.to(device)
     modelSR = modelSR.to(device)
     modelEncoder = modelEncoder.to(device)
+    
+    
 
     torch.cuda.empty_cache()
     
@@ -81,6 +99,7 @@ def main(L_path, save_path, manual_label, eng):
         h, w, c = img.shape
         ShowLQ = cv2.resize(img, (0,0), fx=128/h, fy=128/h,  interpolation=cv2.INTER_CUBIC)
         LQ = cv2.resize(img, (0,0), fx=32/h, fy=32/h,  interpolation=cv2.INTER_CUBIC)
+        ori_lq_w = LQ.shape[1]
 
         TextLQFillBG = np.zeros((32, 32*16, 3)).astype(LQ.dtype)
         if LQ.shape[-2] <= 32*16:
@@ -103,6 +122,58 @@ def main(L_path, save_path, manual_label, eng):
             preds_cls, preds_locs_l_r, w = modelEncoder(LQ)
         
         labels = clear_labels(preds_cls[0])
+        pre_text = get_text_from_labels(labels)
+
+
+        assert w.size(0) == 1
+        w0 = w[:1,...].clone() #
+
+        '''
+        Step 2.5: Predicting the character labels using real-world OCR model trained on real-world chinese dataset, see:
+        https://github.com/FudanVI/benchmarking-chinese-text-recognition/tree/main
+        '''
+        if use_real_ocr:
+            LQForOCR = cv2.resize(img, (256,32), interpolation=cv2.INTER_CUBIC)
+            LQForOCR = transforms.ToTensor()(LQForOCR)
+            LQForOCR = transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(LQForOCR)
+
+            LQForOCR = LQForOCR.unsqueeze(0)
+            LQForOCR = LQForOCR.to(device)
+
+            #---------------character classification--------------------
+            max_length = 20
+            batch = 1
+            pred = torch.zeros(batch,1).long().cuda()
+            image_features = None
+            prob = torch.zeros(batch, max_length).float()
+            for i in range(max_length):
+                length_tmp = torch.zeros(batch).long().cuda() + i + 1
+                with torch.no_grad():
+                    result = modelOCR(image=LQForOCR, text_length=length_tmp, text_input=pred, conv_feature=image_features, test=True)
+                prediction = result['pred']
+                now_pred = torch.max(torch.softmax(prediction,2), 2)[1]
+                prob[:,i] = torch.max(torch.softmax(prediction,2), 2)[0][:,-1]
+                pred = torch.cat((pred, now_pred[:,-1].view(-1,1)), 1)
+                image_features = result['conv']
+
+            text_pred_list = []
+            now_pred = []
+            for j in range(max_length):
+                if pred[0][j] != 6737:
+                    now_pred.append(pred[0][j])
+                else:
+                    break
+            text_pred_list = torch.Tensor(now_pred)[1:].long().cuda()
+            pred_text = ""
+            for i in text_pred_list:
+                if i == (len(alphabet)+2):
+                    continue
+                pred_text += alphabet[i-2]
+
+            labels = get_labels_from_text(pred_text)
+            # print(['New:', pred_text, 'Previous Prediction', pre_text])
+
+
         if manual_label:
             tmp_str = img_basename.split('_')
             pre_text = tmp_str[-1]
@@ -122,10 +193,59 @@ def main(L_path, save_path, manual_label, eng):
         if len(pre_text) < 1:
             print('\tNo character is detected. Continue...')
             continue
-        
-                
-        assert w.size(0) == 1
-        w0 = w[:1,...].clone() #
+
+        '''
+        Step 2.75: Predicting the bbox using our synthtic images
+        '''
+        if use_new_bbox:
+            LQForBBox = cv2.resize(img, (256,32), interpolation=cv2.INTER_CUBIC)
+            LQForBBox = transforms.ToTensor()(LQForBBox)
+            LQForBBox = transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(LQForBBox)
+
+            LQForBBox = LQForBBox.unsqueeze(0)
+            LQForBBox = LQForBBox.to(device)
+
+            #---------------character classification--------------------
+            max_length = 20
+            batch = 1
+            pred = torch.zeros(batch,1).long().cuda()
+            loc = torch.zeros(batch,1).float().cuda()
+            image_features = None
+            for i in range(max_length):
+                length_tmp = torch.zeros(batch).long().cuda() + i + 1
+                with torch.no_grad():
+                    result = modelBBox(image=LQForBBox, text_length=length_tmp, text_input=pred, conv_feature=image_features, test=True)
+                prediction = result['pred']
+                now_pred = torch.max(torch.softmax(prediction,2), 2)[1]
+                pred = torch.cat((pred, now_pred[:,-1].view(-1,1)), 1)
+                now_loc = result['loc'][:,-1].view(-1,1) #* self.opt['datasets']['train']['ocr_width'] # using sigmoid, from 0~1 to 0~256
+                loc = torch.cat((loc, now_loc), 1)
+                image_features = result['conv']
+
+            text_pred_list_bbox = []
+            now_pred = []
+            for j in range(max_length):
+                if pred[0][j] != 6737:
+                    now_pred.append(pred[0][j])
+                else:
+                    break
+            text_pred_list_bbox = torch.Tensor(now_pred)[1:].long().cuda()
+            pred_text_bbox = ""
+            for i in text_pred_list_bbox:
+                if i == (len(alphabet)+2):
+                    continue
+                pred_text_bbox += alphabet[i-2]
+
+            if len(pred_text_bbox) != len(pred_text):
+                print('!!!!!! Change the label from {} to {}'.format(pred_text, pred_text_bbox))
+                pred_text = pred_text_bbox
+                labels = get_labels_from_text(pred_text)
+
+            preds_locs = preds_locs_l_r.clone()
+            for n in range(0, 16*2, 2):
+                preds_locs[0][n] = int(loc[0][n//2+2].item()) * ori_lq_w / 256 / 512 # for ocr 32*512
+                preds_locs[0][n+1] = 0 
+
         
         '''
         Step 3: Generating structure prior.
@@ -145,10 +265,10 @@ def main(L_path, save_path, manual_label, eng):
             print('\tError in {}. Continue...'.format(img_basename))
             continue
         
-        preds_locs = preds_locs_l_r.clone()
-        for n in range(0, 16*2, 2):
-            preds_locs[0][n] = (preds_locs_l_r[0][n+1] + preds_locs_l_r[0][n]) / 2.0 #center
-            preds_locs[0][n+1] = (preds_locs_l_r[0][n+1] - preds_locs_l_r[0][n]) / 2.0 # width
+        # preds_locs = preds_locs_l_r.clone()
+        # for n in range(0, 16*2, 2):
+        #     preds_locs[0][n] = (preds_locs_l_r[0][n+1] + preds_locs_l_r[0][n]) / 2.0 #center
+        #     preds_locs[0][n+1] = (preds_locs_l_r[0][n+1] - preds_locs_l_r[0][n]) / 2.0 # width
         
 
         '''
@@ -190,6 +310,7 @@ def main(L_path, save_path, manual_label, eng):
             ShowLocs[:64, max(0, x-pad):min(x+pad, img_max_width), 2] = ShowLocs[:64, max(0, x-pad):min(x+pad, img_max_width), 2]*0
             ShowLocs[64:, max(0, y-padr):min(y+padr, img_max_width), 2] = ShowLocs[64:, max(0, y-padr):min(y+padr, img_max_width), 2]*0 + 255
         cv2.imwrite(osp.join(save_path, img_basename+'_{}.png'.format(pre_text)), np.vstack((ShowLQ[:,:,::-1], ShowLocs[:,:,::-1], ShowSR, prior)))
+        # exit('ss')
 
 
 if __name__ == '__main__':
@@ -197,8 +318,15 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--test_path', type=str, default='./Testsets/LQs')
     parser.add_argument('-o', '--save_path', type=str, default=None)
     parser.add_argument('-m', '--manual', action='store_true')
-    parser.add_argument('-e', '--eng', action='store_true')
+    parser.add_argument('--real_ocr', action='store_false')
     args = parser.parse_args()
+
+    '''
+    We add new real-world ocr model and new robust bbox detection.
+    Set 
+    '''
+    use_new_bbox = True
+    use_real_ocr = True
 
     save_path = args.save_path
     if save_path is None:
@@ -213,11 +341,14 @@ if __name__ == '__main__':
     else:
         print('{:>25s} : {}'.format('The format of text label', 'using predicted text label'))
     
-    if args.eng:
-        print('{:>25s} : {}'.format('Mainly Trained on', 'English and Number'))
+    if use_real_ocr:
+        print('{:>25s} : {}'.format('OCR Module', 'using ocr model trained on public chinese ocr dataset (Preferred)'))
     else:
-        print('{:>25s} : {}'.format('Mainly Trained on', 'Chinese'))
+        print('{:>25s} : {}'.format('OCR Module', 'using ocr model trained on our synthetic data'))
 
-    main(args.test_path, save_path, args.manual, args.eng)
+    
+    
+
+    main(args.test_path, save_path, args.manual, use_real_ocr, use_new_bbox)
 
 
