@@ -14,12 +14,14 @@ S-Lab, Nanyang Technological University
 
 </div>
 
-> Note that this work only focuses on the LR input with a regular layout which may not have any perspective transformation (see the details in our paper).
 
 
 ```diff
-+ 2023-12-29: (New) We update a new bounding box detection and real-world OCR models, which is much better than the previous models.
++ 2023-12-29: We update a new bounding box detection and real-world OCR models, which is much better than the previous models.
 ```
+
+
+> Note that this work only focuses on the LR input with a regular layout which may not have any perspective transformation (see the details in our paper).
 
 ## TODO
 - [x] Release the inference code and model in April.
