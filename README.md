@@ -1,6 +1,9 @@
-## [Learning Generative Structure Prior for Blind Text Image Super-resolution](https://arxiv.org/pdf/2303.14726.pdf)
+<div align="center">
+
+  ## [Learning Generative Structure Prior for Blind Text Image Super-resolution](https://arxiv.org/pdf/2303.14726.pdf)
 
 [Xiaoming Li](https://csxmli2016.github.io/), [Wangmeng Zuo](https://scholar.google.com/citations?hl=en&user=rUOpCEYAAAAJ&view_op=list_works), [Chen Change Loy](https://www.mmlab-ntu.com/person/ccloy/)
+
 
 S-Lab, Nanyang Technological University
 
@@ -9,11 +12,15 @@ S-Lab, Nanyang Technological University
 
 <p align="justify">Blind text image super-resolution (SR) is challenging as one needs to cope with diverse font styles and unknown degradation. To address the problem, existing methods perform character recognition in parallel to regularize the SR task, either through a loss constraint or intermediate feature condition. Nonetheless, the high-level prior could still fail when encountering severe degradation. The problem is further compounded given characters of complex structures, e.g., Chinese characters that combine multiple pictographic or ideographic symbols into a single character. In this work, we present a novel prior that focuses more on the character structure. In particular, we learn to encapsulate rich and diverse structures in a StyleGAN and exploit such generative structure priors for restoration. To restrict the generative space of StyleGAN so that it obeys the structure of characters yet remains flexible in handling different font styles, we store the discrete features for each character in a codebook. The code subsequently drives the StyleGAN to generate high-resolution structural details to aid text SR. Compared to priors based on character recognition, the proposed structure prior exerts stronger character-specific guidance to restore faithful and precise strokes of a designated character. Extensive experiments on synthetic and real datasets demonstrate the compelling performance of the proposed generative structure prior in facilitating robust text SR. </p>
 
+</div>
+
+> Note that this work only focuses on the LR input with a regular layout which may not have any perspective transformation (see the details in our paper).
+
 ## TODO
 - [x] Release the inference code and model in April.
 - [x] Release the training code. See ```./Train```
-- [x] Release a model focusing on English letters and numbers.
 - [x] [We provide a simple blind text region super-resolution framework](https://github.com/csxmli2016/textbsr) by ```pip install textbsr```
+- [x] 2023-12-29: (New) We update a new bounding box detection model and real-world OCR model. The Character Bounding Box Detection is much better than the previous model.
 
 ## Getting Start
 
@@ -43,16 +50,10 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 # Parameters:
 -i: LR path, default: ./Testsets/LQs
 -o: save path, default: None will automatically make the saving dir with the format of '[LR path]_TIME_MARCONet'
+--real_ocr: using the OCR model that is trained on publicly real-world Chinese Character Recognition datasets.
 ```
+> If the OCR performance is not good, you can try to use the parameter ```--real_ocr```
 
-## Inference for English and Number SR
-```
-CUDA_VISIBLE_DEVICES=0 python test_sr.py -i ./Testsets/LQsEng -e
-```
-```
-# Parameters:
--e: using model that fine-tuned on English and Number
-```
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
 <img src="./Imgs/real_lq01.png"  height="220px">&nbsp;&nbsp;<img src="./Imgs/real_lq04.png"  height="220px">
