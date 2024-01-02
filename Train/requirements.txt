@@ -8,3 +8,7 @@ facexlib>=0.2.0.3
 lmdb
 pyyaml
 yapf
+einops
+lpips
+imgaug
+
