@@ -11,4 +11,4 @@ yapf
 einops
 lpips
 imgaug
-
+ninja
