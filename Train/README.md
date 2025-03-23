@@ -47,7 +47,7 @@ CUDA_VISIBLE_DEVICES=0 python tspgan/train.py -opt options/train.yml
 ```
 or
 ```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch —nproc_per_node=4 —master_port=43210 tspgan/train.py -opt options/train.yml —launcher pytorch
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch —-nproc_per_node=4 -—master_port=43210 tspgan/train.py -opt options/train.yml -—launcher pytorch
 ```
 
 You can see the training details on ```http://127.0.0.1:19001/``` by running
