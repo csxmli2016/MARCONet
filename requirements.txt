@@ -1,8 +1,12 @@
-torch==1.12.1
-numpy<1.21
+torch==2.0.1
+torchvision==0.15.2
+numpy
 matplotlib
 opencv-python
-torchvision
 imageio
 ninja
 einops
+opencv-python-headless
+datasets
+modelscope[framework]
+ultralytics
