@@ -17,11 +17,11 @@ S-Lab, Nanyang Technological University
 
 
 ```diff
-+ 2023-12-29: We update a new bounding box detection and real-world OCR models, which is much better than the previous models.
++ 2025-06-26: We updated a new bounding box detection using yolo 11m and real-world OCR models, which is much better than the previous models.
 ```
 
 
-> Note that this work only focuses on the LR input with a regular layout which may not have any perspective transformation (see the details in our paper).
+> Note that this work only focuses on the LR input with **a regular layout** which may not have any perspective transformation (see the details in our paper).
 
 ## TODO
 - [x] Release the inference code and model in April.
@@ -56,9 +56,7 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 # Parameters:
 -i: LR path, default: ./Testsets/LQs
 -o: save path, default: None will automatically make the saving dir with the format of '[LR path]_TIME_MARCONet'
---real_ocr: using the OCR model that is trained on publicly real-world Chinese Character Recognition datasets.
 ```
-> If the OCR performance is not good, you can try to use the parameter ```--real_ocr```
 
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
