@@ -38,17 +38,17 @@ conda activate marconet
 pip install -r requirements.txt
 BASICSR_EXT=True pip install basicsr
 ```
-> Please carefully follow the installation steps, especially the final one with **BASICSR_EXT=True**. 
+> Please carefully follow the installation steps, especially the final one with **BASICSR_EXT=True**.
+> When torchvision > 0.15.2, there may be some problems in Basicsr.
 
 ## Pre-trained Models
 Download the pre-trained models
 ```
 python checkpoints/download_github.py
 ```
-## Training Code
-See ```./Train``` for more details.
 
-## Inference for Chinese SR
+
+## Inference for *Regular Chinese Text Image* SR
 ```
 CUDA_VISIBLE_DEVICES=0 python test_sr.py 
 ```
@@ -58,6 +58,22 @@ CUDA_VISIBLE_DEVICES=0 python test_sr.py
 -o: save path, default: None will automatically make the saving dir with the format of '[LR path]_TIME_MARCONet'
 ```
 
+### ⚠️ Common Error and Solution
+
+If you encounter the following error:
+
+```NameError: name 'fused_act_ext' is not defined```
+
+Try running the following command:
+
+```bash
+export BASICSR_JIT='True'
+```
+
+✅ This has resolved the issue in most of our cases.
+
+## Training Code
+See ```./Train``` for more details.
 
 ### Some restoration results on real-world LR text segments (From top to bottom: LR input, bounding box, SR result, and structure prior image)
 <img src="./Imgs/real_lq01.png"  height="220px">&nbsp;&nbsp;<img src="./Imgs/real_lq04.png"  height="220px">
