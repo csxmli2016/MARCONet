@@ -52,7 +52,7 @@ def main(L_path, save_path, manual_label):
     modelEncoder.eval()
 
 
-    yolo_character = YOLO('/mnt/sfs-common/xmli/Projects/1_Text/yolo/experiments/train2/weights/best.pt')
+    yolo_character = YOLO('./checkpoints/yolo11m_character.pt')
     real_ocr_pipeline = pipeline(Tasks.ocr_recognition, model='damo/cv_convnextTiny_ocr-recognition-general_damo')
 
 
