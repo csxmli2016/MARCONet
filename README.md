@@ -23,6 +23,9 @@ S-Lab, Nanyang Technological University
 
 > Note that this work only focuses on the LR input with **a regular layout** which may not have any perspective transformation (see the details in our paper).
 
+## News
+Our extension of this work, [MARCONet++](https://github.com/csxmli2016/MARCONetPlusPlus), has been released, which has better performance in handling real-world text images. 
+
 ## TODO
 - [x] Release the inference code and model in April.
 - [x] Release the training code. See ```./Train```
